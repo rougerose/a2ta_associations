@@ -15,8 +15,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'champ_date_creation_label' => 'Date de création',
 	'champ_membre_fraap_label' => 'Membre de la FRAAP',
 	'champ_nom_label' => 'Nom',
-	'champ_url_site_label' => 'URL site web',
-	'champ_url_site_supp_label' => 'URL site web secondaire',
+	'champ_url_site_label' => 'Site web principal',
+	'champ_url_site_supp_label' => 'Site web secondaire',
 	'confirmer_supprimer_association' => 'Confirmez-vous la suppression de cette association ?',
 
 	// D
