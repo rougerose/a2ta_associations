@@ -3,3 +3,6 @@ node_modules/
 yarn.*
 yarn-error.log
 *.diff
+
+# données csv spécifiques
+questionnaire*.csv
