@@ -6,7 +6,7 @@
   compatibilite="[3.2.7;3.2.*]"
   logo=""
   documentation=""
-  schema="1.0.1"
+  schema="1.0.5"
 >
   <!--
     Paquet généré le 2020-03-06 15:03:17
@@ -21,6 +21,7 @@
   <necessite nom="coordonnees" />
   <necessite nom="saisies" compatibilite="[3.23.2;]" />
   <necessite nom="verifier" compatibilite="[1.0.6;]" />
+  <necessite nom="gis" compatibilite="[4.47.18;]" />
 
   <pipeline nom="autoriser" inclure="a2ta_associations_autorisations.php" />
 

@@ -28,8 +28,19 @@ function a2ta_associations_upgrade($nom_meta_base_version, $version_cible) {
 
   $maj['create'] = array(array('maj_tables', array('spip_associations')));
 
+	// Adresses : ajout champs régions et département
   $maj['1.0.1'] = array(
     array('maj_tables', array('spip_adresses'))
+  );
+
+	// Associations : ajout champs sites web
+  $maj['1.0.4'] = array(
+    array('maj_tables', array('spip_associations'))
+  );
+
+  $maj['1.0.5'] = array(
+		array('sql_alter', 'TABLE spip_associations CHANGE site_web url_site TINYTEXT NOT NULL DEFAULT ""'),
+		array('sql_alter', 'TABLE spip_associations CHANGE site_web_supp url_site_supp TINYTEXT NOT NULL DEFAULT ""'),
   );
 
   include_spip('base/upgrade');

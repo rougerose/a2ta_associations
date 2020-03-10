@@ -17,6 +17,73 @@ include_spip('inc/actions');
 include_spip('inc/editer');
 
 
+function formulaires_editer_association_saisies_dist($id_association='new', $retour='', $lier_trad=0, $config_fonc='', $row=array(), $hidden='') {
+	$saisies = array(
+		array(
+			'saisie' => 'hidden',
+			'options' => array(
+				'nom' => 'id_association',
+				'defaut' => $id_association
+			)
+		),
+		array(
+			'saisie' => 'input',
+			'options' => array(
+				'nom' => 'nom',
+				'label' => _T('association:champ_nom_label'),
+				'obligatoire' => 'oui'
+			)
+		),
+		array(
+			'saisie' => 'radio',
+			'options' => array(
+				'nom' => 'membre_fraap',
+				'label' => _T('association:champ_membre_fraap_label'),
+				'defaut' => '0',
+				'data' => array('1' => 'Oui', '0' => 'Non')
+			)
+		),
+		array(
+			'saisie' => 'input',
+			'options' => array(
+				'nom' => 'url_site',
+				'label' => _T('association:champ_url_site_label'),
+
+			),
+			'verifier' => array(
+				'type' => 'url',
+				'options' => array(
+					'mode' => 'php_filter'
+				)
+			)
+		),
+		array(
+			'saisie' => 'input',
+			'options' => array(
+				'nom' => 'url_site_supp',
+				'label' => _T('association:champ_url_site_supp_label'),
+
+			),
+			'verifier' => array(
+				'type' => 'url',
+				'options' => array(
+					'mode' => 'php_filter'
+				)
+			)
+		),
+		array(
+			'saisie' => 'date',
+			'options' => array(
+				'nom' => 'date_creation',
+				'label' => _T('association:champ_date_creation_label'),
+
+			)
+		),
+	);
+	return $saisies;
+}
+
+
 /**
  * Identifier le formulaire en faisant abstraction des paramètres qui ne représentent pas l'objet edité
  *

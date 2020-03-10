@@ -46,13 +46,15 @@ function a2ta_associations_declarer_tables_objets_sql($tables) {
 		'type' => 'association',
 		'principale' => 'oui',
 		'field'=> array(
-			'id_association'     => 'bigint(21) NOT NULL',
-			'nom'                => 'tinytext NOT NULL DEFAULT ""',
-			'membre_fraap'       => 'tinyint(1) NOT NULL DEFAULT 0',
-			'date_creation'      => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
-			'date'               => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
-			'statut'             => 'varchar(20)  DEFAULT "0" NOT NULL',
-			'maj'                => 'TIMESTAMP'
+			'id_association' => 'bigint(21) NOT NULL',
+			'nom'            => 'tinytext NOT NULL DEFAULT ""',
+			'membre_fraap'   => 'tinyint(1) NOT NULL DEFAULT 0',
+			'url_site'       => 'tinytext NOT NULL DEFAULT ""',
+			'url_site_supp'  => 'tinytext NOT NULL DEFAULT ""',
+			'date_creation'  => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
+			'date'           => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
+			'statut'         => 'varchar(20)  DEFAULT "0" NOT NULL',
+			'maj'            => 'TIMESTAMP'
 		),
 		'key' => array(
 			'PRIMARY KEY'        => 'id_association',
@@ -60,8 +62,8 @@ function a2ta_associations_declarer_tables_objets_sql($tables) {
 		),
 		'titre' => 'nom AS titre, "" AS lang',
 		'date' => 'date',
-		'champs_editables'  => array('nom', 'membre_fraap', 'date_creation'),
-		'champs_versionnes' => array('nom', 'membre_fraap', 'date_creation'),
+		'champs_editables'  => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp'),
+		'champs_versionnes' => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp'),
 		'rechercher_champs' => array(),
 		'tables_jointures'  => array(),
 		'statut_textes_instituer' => array(
