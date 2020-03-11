@@ -47,7 +47,7 @@ function a2ta_associations_formulaire_saisies($flux) {
   if (in_array($flux['args']['form'], $forms)) {
     include_spip('inc/saisies');
     $flux['data'] = saisies_supprimer($flux['data'], 'titre');
-    $flux['data'] = saisies_modifier($flux['data'], 'type', array('options' => array('defaut' => 'work')));
+    $flux['data'] = saisies_modifier($flux['data'], 'type', array('options' => array('defaut' => _COORDONNEES_TYPE_DEFAUT)));
   }
 
   return $flux;
