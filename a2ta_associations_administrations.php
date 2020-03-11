@@ -63,6 +63,11 @@ function a2ta_associations_vider_tables($nom_meta_base_version) {
   sql_delete('spip_documents_liens', sql_in('objet', array('association')));
   sql_delete('spip_mots_liens', sql_in('objet', array('association')));
   sql_delete('spip_auteurs_liens', sql_in('objet', array('association')));
+  sql_delete('spip_adresses_liens', sql_in('objet', array('association')));
+  sql_delete('spip_emails_liens', sql_in('objet', array('association')));
+	sql_delete('spip_numeros_liens', sql_in('objet', array('association')));
+  sql_delete('spip_gis_liens', sql_in('objet', array('association')));
+  sql_delete('spip_rezosocios_liens', sql_in('objet', array('association')));
   # Nettoyer les versionnages et forums
   sql_delete('spip_versions', sql_in('objet', array('association')));
   sql_delete('spip_versions_fragments', sql_in('objet', array('association')));
