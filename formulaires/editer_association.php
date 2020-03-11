@@ -53,7 +53,7 @@ function formulaires_editer_association_saisies_dist($id_association='new', $ret
 			'verifier' => array(
 				'type' => 'url',
 				'options' => array(
-					'mode' => 'php_filter'
+					'mode' => 'protocole_seul'
 				)
 			)
 		),
@@ -67,7 +67,7 @@ function formulaires_editer_association_saisies_dist($id_association='new', $ret
 			'verifier' => array(
 				'type' => 'url',
 				'options' => array(
-					'mode' => 'php_filter'
+					'mode' => 'protocole_seul'
 				)
 			)
 		),
