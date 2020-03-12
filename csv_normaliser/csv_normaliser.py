@@ -21,7 +21,7 @@ with open('questionnaire.csv', 'r') as datas:
 
             # Vérifier si certaines données essentielles sont manquantes,
             # dans cette hypothèse, la ligne entière est ignorée
-            if (line['nom'] or line['adresse']):
+            if (line['nom']):
 
                 # L'association accepte d'être sur le site de cartographie.
                 # Les associations qui refusent ne sont pas conservées.
