@@ -26,7 +26,7 @@ if (!defined('_ECRIRE_INC_VERSION')) {
 function a2ta_associations_upgrade($nom_meta_base_version, $version_cible) {
   $maj = array();
 
-  $maj['create'] = array(array('maj_tables', array('spip_associations')));
+  $maj['create'] = array(array('maj_tables', array('spip_associations', 'spip_adresses')));
 
 	// Adresses : ajout champs régions et département
   $maj['1.0.1'] = array(
