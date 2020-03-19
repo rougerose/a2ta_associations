@@ -1,0 +1,13 @@
+<BOUCLE_adresse(ADRESSES){id_adresse}{statut?}{tout}>
+<div class="champ contenu_titre[ (#TITRE*|strlen|?{'',vide})]">
+	<div class='label'><:info_titre:></div>
+	<div dir='#LANG_DIR' class='#EDIT{titre} titre'>#TITRE</div>
+</div>
+#ADRESSE_FORMATER
+	<BOUCLE_departement(GEO_SUBDIVISIONS){code=#DEPARTEMENT*}>
+		<p><em>#NOM</em></p>
+	</BOUCLE_departement>
+	<BOUCLE_region(GEO_SUBDIVISIONS){code=#REGION*}>
+		<p><em>#NOM</em></p>
+	</BOUCLE_region>
+</BOUCLE_adresse>

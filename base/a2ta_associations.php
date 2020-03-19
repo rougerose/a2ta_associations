@@ -26,6 +26,7 @@ if (!defined('_ECRIRE_INC_VERSION')) {
 function a2ta_associations_declarer_tables_interfaces($interfaces) {
 
 	$interfaces['table_des_tables']['associations'] = 'associations';
+	$interfaces['table_des_tables']['associations_import_logs'] = 'associations_import_logs';
 
 	return $interfaces;
 }
@@ -54,6 +55,7 @@ function a2ta_associations_declarer_tables_objets_sql($tables) {
 			'date_creation'  => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
 			'date'           => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
 			'statut'         => 'varchar(20)  DEFAULT "0" NOT NULL',
+			'log_import' => 'text NOT NULL DEFAULT ""',
 			'maj'            => 'TIMESTAMP'
 		),
 		'key' => array(
@@ -62,8 +64,8 @@ function a2ta_associations_declarer_tables_objets_sql($tables) {
 		),
 		'titre' => 'nom AS titre, "" AS lang',
 		'date' => 'date',
-		'champs_editables'  => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp'),
-		'champs_versionnes' => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp'),
+		'champs_editables'  => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp', 'log_import'),
+		'champs_versionnes' => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp', 'log_import'),
 		'rechercher_champs' => array(),
 		'tables_jointures'  => array(),
 		'statut_textes_instituer' => array(
@@ -83,6 +85,27 @@ function a2ta_associations_declarer_tables_objets_sql($tables) {
 			)
 		),
 		'texte_changer_statut' => 'association:texte_changer_statut_association',
+	);
+
+	$tables['spip_associations_imports'] = array(
+		'type' => 'associations_import',
+		'principale' => 'oui',
+		'table_objet_surnoms' => array('associationsimport'), // table_objet('associations_importlog') => 'associations_import_logs'
+		'field'=> array(
+			'id_associations_import' => 'bigint(21) NOT NULL',
+			'date'               => 'datetime NOT NULL DEFAULT "0000-00-00 00:00:00"',
+			'associations' => 'text NOT NULL DEFAULT ""',
+			'maj'                => 'TIMESTAMP'
+		),
+		'key' => array(
+			'PRIMARY KEY'        => 'id_associations_import',
+		),
+		'titre' => '"" AS titre, "" AS lang',
+		 #'date' => '',
+		'champs_editables'  => array(),
+		'champs_versionnes' => array(),
+		'rechercher_champs' => array(),
+		'tables_jointures'  => array(),
 	);
 
   $tables['spip_adresses']['field']['region'] = 'text not null default ""';

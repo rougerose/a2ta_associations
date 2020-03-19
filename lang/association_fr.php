@@ -31,6 +31,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 	// L
 	'label_departement' => 'Département',
+	'label_departement_abr' => 'Départ.',
 	'label_region' => 'Région',
 
 	// R

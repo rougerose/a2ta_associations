@@ -37,14 +37,14 @@ function adresses_FR() {
       ),
     ),
     array(
-      'saisie' => 'geo_departement',
+      'saisie' => 'geo_departement_code',
       'options' => array(
         'nom' => 'departement',
         'label' => _T('association:label_departement')
       ),
     ),
     array(
-      'saisie' => 'geo_region',
+      'saisie' => 'geo_region_code',
       'options' => array(
         'nom' => 'region',
         'label' => _T('association:label_region')

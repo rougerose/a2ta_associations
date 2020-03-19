@@ -16,11 +16,19 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'cfg_titre_parametrages' => 'Paramétrages',
 
 	// I
-	'importer_pas_de_fichier' => 'Aucun fichier à importer',
+	'importer_erreur_nom_absent' => "** Aucun nom pour l'association, les données associées n'ont pas été importées **",
+	'importer_pas_de_fichier' => 'Aucun fichier à importer.',
+	'importer_pas_de_donnees' => "Aucune donnée n'a pu être importée.",
+	'importer_probleme_fichier' => "Le fichier importé n'a pu être traité.",
 
 	// L
 	'label_importer' => 'Fichier CSV',
+	'label_submit_afficher_log' => 'Afficher',
+	'label_selection_log' => 'Sélectionner un compte-rendu',
+	'label_contenu_log' => 'Compte-rendu de l\'importation',
 
 	// T
-	'titre_page_configurer_a2ta_associations' => 'Configurer les associations',
+	'titre_afficher_log' => "Afficher un compte-rendu d'importation",
+	'titre_importer_csv' => 'Importer un fichier CSV',
+	'titre_page_configurer_a2ta_associations' => 'Configuration du plugin « A2TA Associations »',
 );
