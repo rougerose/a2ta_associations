@@ -12,7 +12,19 @@ include_spip('inc/filtres');
 include_spip('inc/modifier'); // collecter_requests()
 
 
-function inc_importer_association($id_association_import, $donnees) {
+/**
+ * Importer les données d'une association
+ * @param  integer  $id_association_import
+ * 	A chaque import une ligne est ajoutée dans la table associations_imports
+ * 	qui contiendra les id des associations importées. Cela permet a postériori
+ * 	de consulter le log d'import de chaque association.
+ * @param  array  $donnees
+ * 	Les données relative à l'association
+ * @param  integer $publier
+ * 	Faut-il publier l'association ?
+ * @return boolean
+ */
+function inc_importer_association($id_association_import, $donnees, $publier = 0) {
 	$verifier = charger_fonction('verifier', 'inc');
 	foreach ($donnees as $row) {
 		$resultat = true;
@@ -182,12 +194,26 @@ function inc_importer_association($id_association_import, $donnees) {
 
 				objet_modifier('associations_import', $id_association_import, $import_champs);
 			}
+
+			if ($publier) {
+				objet_instituer('association', $id_association, array('statut' => 'publie'));
+			}
 		}
 	}
 	return $resultat;
 }
 
 
+/**
+ * Importer et créer les données relative à l'adresse d'une asso.
+ * Si les données minimum (code postal ou ville) sont
+ * présentes, on créé également un point de géo-localisation.
+ * @param  integer $id_association
+ * @param  array $row
+ * 	Les données de l'association
+ * @return array
+ * 	Le log relatif aux données d'adresse
+ */
 function importer_association_adresse($id_association, $row) {
 	$log = array();
 
@@ -273,6 +299,15 @@ function importer_association_adresse($id_association, $row) {
 	return $log;
 }
 
+
+/**
+ * Importer et créer un email d'une association
+ * @param  integer $id_association
+ * @param  array $row
+ * 	Les données relative à l'association
+ * @return array
+ * 	Le log relatif au mail
+ */
 function importer_association_email($id_association, $row) {
 	$log = array();
 
@@ -300,6 +335,14 @@ function importer_association_email($id_association, $row) {
 }
 
 
+/**
+ * Importer et créer les réseaux sociaux d'une association
+ * @param  integer $id_association
+ * @param  array $row
+ * 	Les données relatives à l'association
+ * @return array
+ * 	Le log relatif aux réseaux sociaux.
+ */
 function importer_association_rezos($id_association, $row) {
 	$log = array();
 
@@ -537,6 +580,16 @@ function importer_adresse_completer($region = '', $code_postal = '') {
 }
 
 
+/**
+ * Importer les données relatives aux activités de l'association.
+ * @param  integer $id_association
+ * @param  array $activites
+ * 	Le tableau des activités de l'association
+ * @param  array $mots_cles
+ * 	Le tableau des mots-clés du site relatifs aux activités
+ * @return array
+ * 	Le log des activités
+ */
 function importer_association_activites($id_association, $activites, $mots_cles) {
 	$log = array();
 
@@ -628,5 +681,5 @@ function array_search_partiel($mots, $texte) {
 		if (preg_match("/$pattern/i", $texte)) {
 			return $index;
 		}
-  }
+	}
 }

@@ -23,6 +23,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 	// L
 	'label_importer' => 'Fichier CSV',
+	'label_importer_publier' => 'Publier les associations importées',
 	'label_submit_afficher_log' => 'Afficher',
 	'label_selection_log' => 'Sélectionner un compte-rendu',
 	'label_contenu_log' => 'Compte-rendu de l\'importation',

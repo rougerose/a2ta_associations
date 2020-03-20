@@ -21,17 +21,25 @@ function formulaires_importer_associations_saisies_dist() {
 				)
 			)
 		),
+		array(
+			'saisie' => 'radio',
+			'options' => array(
+				'nom' => 'publier',
+				'label' => _T('a2ta_associations:label_importer_publier'),
+				'defaut' => '0',
+				'data' => array('1' => 'Oui', '0' => 'Non')
+			)
+		)
 	);
 	return $saisies;
 }
 
 
 function formulaires_importer_associations_charger_dist() {
-	$valeurs = array();
-
-	// include_spip('test/test');
-	// test_region();
-
+	$valeurs = array(
+		'fichier' => '',
+		'publier' => ''
+	);
 	return $valeurs;
 }
 
@@ -51,11 +59,12 @@ function formulaires_importer_associations_traiter_dist() {
 
 	$fichier = $_FILES['fichier'];
 
+	// Copier le fichier dans un répertoire temporaire
 	include_spip('action/editer_objet');
 	$traiter_fichier = charger_fonction('traiter_fichier', 'inc');
 
 	if ($infos_fichier = $traiter_fichier($fichier)) {
-
+		// Importer les données CSV
 		$importer_csv = charger_fonction('importer_csv', 'inc');
 		$datas = $importer_csv($infos_fichier['tmp_name'], true);
 
@@ -63,10 +72,11 @@ function formulaires_importer_associations_traiter_dist() {
 			//
 			// Inspiré du script d'importation de La Fabrique
 			//
-			// inserer les donnees en base.
+			// Inserer les donnees en base.
 			$nb_inseres = 0;
 			$nb_deja_la = 0;
 			$inserts = array();
+			$publier = _request('publier');
 
 			// Ne pas réimporter ceux déjà présents. La vérification se fait
 			// uniquement sur le nom de l'association.
@@ -84,23 +94,30 @@ function formulaires_importer_associations_traiter_dist() {
 				$champs_import = array('date' => date("Y-m-d H:i:s"));
 				$id_association_import = objet_inserer('associations_import', null, $champs_import);
 
-				// on decoupe en petit bout (pour reprise sur timeout)
+				// Découper par lot de 50
 				$inserts = array_chunk($inserts, 50);
 
 				$importer_association = charger_fonction('importer_association', 'inc');
 
 				foreach ($inserts as $insert) {
-					$resultat_insert = $importer_association($id_association_import, $insert);
+					$resultat_insert = $importer_association($id_association_import, $insert, $publier);
 					$nb_inseres += count($insert);
 
-					if ($nb_inseres == 50) {
-						$a_faire = $nb_a_inserer - $nb_inseres;
-						$message = "Relancer l'importation.<br>$nb_deja_la associations sont déjà importées.<br>$nb_inseres associations viennent d'être importées.<br>$a_faire restent à importer.";
-						$retour['message_erreur'] = $message;
+					// Problème de nom sur une association
+					if (!$resultat_insert) {
+						$retour['message_erreur'] = "Le nom d'une association est manquant. Veuillez vérifier les données source.";
 						break;
+					} else {
+						// Arrêter la boucle à 50
+						if ($nb_inseres == 50) {
+							$a_faire = $nb_a_inserer - $nb_inseres;
+							$message = "Relancer l'importation.<br>$nb_deja_la associations sont déjà importées.<br>$nb_inseres associations viennent d'être importées.<br>$a_faire restent à importer.";
+							$retour['message_erreur'] = $message;
+							break;
+						}
+						$retour['message_ok'] = "Fichier importé.";
 					}
 				}
-				$retour['message_ok'] = "Fichier importé.";
 			} else {
 				$retour['message_erreur'] = "Les associations issues de ce fichier sont déjà importées.";
 			}
@@ -113,8 +130,6 @@ function formulaires_importer_associations_traiter_dist() {
 
 	// effacer le fichier
 	$traiter_fichier($fichier, true);
-
-	//$retour['message_ok'] = $resultat_import;
 
 	$retour['editable'] = true;
 	return $retour;

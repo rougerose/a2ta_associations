@@ -5,6 +5,12 @@ if (!defined("_ECRIRE_INC_VERSION")) {
   return;
 }
 
+/**
+ * Traiter le fichier : soit le copier, soit le supprimer
+ * @param  array  $fichier
+ * @param  boolean $supprimer [description]
+ * @return void|array
+ */
 function inc_traiter_fichier($fichier, $supprimer = false) {
 	$infos_fichier = array();
 
