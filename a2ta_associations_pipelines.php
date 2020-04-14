@@ -14,9 +14,6 @@ if (!defined('_ECRIRE_INC_VERSION')) {
 }
 
 
-
-
-
 /**
  * Optimiser la base de données
  *
@@ -52,23 +49,3 @@ function a2ta_associations_formulaire_saisies($flux) {
 
   return $flux;
 }
-
-
-// function a2ta_associations_recuperer_fond($flux) {
-// 	$f = $flux;
-// 	if ($flux['args']['fond'] == 'prive/objets/liste/adresses') {
-// 		$f = $flux;
-// 	}
-// 	return $flux;
-// }
-
-// function a2ta_associations_formulaire_traiter($flux) {
-// 	if ($flux['args']['form'] == 'editer_adresse') {
-// 		include_spip('action/editer_liens');
-// 		$id_adresse = _request('id_adresse');
-// 		$departement = _request('departement');
-// 		$region = _request('region');
-// 	}
-//
-// 	return $flux;
-// }
