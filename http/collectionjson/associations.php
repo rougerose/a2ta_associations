@@ -249,16 +249,17 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 	$ville = $contexte['parametres']['ville'];
 
 	$lignes = array();
+	$select = array($cle, 'nom', 'url_site', 'url_site_supp');
 
 	if (is_null($id_association) and is_null($id_mot) and is_null($ville)) {
-		$select = array($cle, 'nom', 'url_site', 'url_site_supp');
+
 		if ($count) {
 			$lignes = sql_countsel($from);
+
 		} else {
 			$lignes = sql_allfetsel($select, $from, '', '', $orderby, $limit, '');
+
 		}
-
-
 	} else {
 
 		if ($id_association) {
@@ -286,9 +287,12 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 
 		if ($count) {
 			$lignes = sql_countsel($from, $where, $groupby, $having);
+
 		} else {
-			$lignes = sql_allfetsel($cle.', nom, url_site, url_site_supp', $from, $where, $groupby, $orderby, $limit, $having);
+			$lignes = sql_allfetsel($select, $from, $where, $groupby, $orderby, $limit, $having);
+
 		}
+
 	}
 
 	return $lignes;
