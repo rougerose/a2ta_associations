@@ -150,9 +150,12 @@ function http_collectionjson_associations_get_ressource($requete, $reponse) {
 	$objet = objet_type($collection);
 
 	$select = array($cle, 'nom', 'url_site', 'url_site_supp');
+	$from = $table.' AS l1';
+	$from .= ' INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
+	$where = array('l1.statut='.sql_quote('publie'));
+	$where[] = "$cle=$id_objet";
 
-	// TODO: ajouter la jointure sur spip_gis_liens
-	$champs = sql_fetsel($select, $table, $cle . '=' . $id_objet);
+	$champs = sql_fetsel($select, $from, $where);
 
 	if ($champs) {
 		$item = collectionjson_get_objet($objet, $id_objet, $champs);
