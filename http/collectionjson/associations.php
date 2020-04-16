@@ -18,6 +18,7 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 
 	$collection = $requete->attributes->get('collection');
 	$offset = $requete->query->get('offset');
+	$limit = $requete->query->get('limit');
 
 	// parametres possibles
 	$parametres = array(
@@ -37,7 +38,7 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 		'id_table_objet' => $cle,
 		'parametres' => $parametres,
 		'offset' => isset($offset) ? $offset : 0,
-		'pagination' => 10
+		'pagination' => isset($limit) ? $limit : 10
 	);
 
 	// récupérer le contenu
@@ -45,7 +46,7 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 
 	if ($lignes) {
 		$objets = array();
-		// le total sans les critères de pagination
+		// compter le nombre total d'objets sans les contraintes de pagination
 		$nb_objets = a2ta_associations_recuperer_contenu_collection($contexte, true);
 		$pagination = $contexte['pagination'];
 		$offset = $contexte['offset'];
@@ -56,6 +57,7 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 
 		// pagination
 		$links = array();
+		$url = self('&');
 
 		if ($offset > 0) {
 			$offset_precedent = max(0, $offset-$pagination);
@@ -63,7 +65,7 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 				'rel' => 'prev',
 				'prompt' => _T('public:page_precedente'),
 				'href' => url_absolue(
-					parametre_url(self('&'), 'offset', $offset_precedent)),
+					parametre_url($url, 'offset', $offset_precedent, '&')),
 			);
 		}
 
@@ -73,7 +75,7 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 				'rel' => 'next',
 				'prompt' => _T('public:page_suivante'),
 				'href' => url_absolue(
-					parametre_url(self('&'), 'offset', $offset_suivant)),
+					parametre_url($url, 'offset', $offset_suivant, '&')),
 			);
 		}
 
@@ -149,6 +151,7 @@ function http_collectionjson_associations_get_ressource($requete, $reponse) {
 
 	$select = array($cle, 'nom', 'url_site', 'url_site_supp');
 
+	// TODO: ajouter la jointure sur spip_gis_liens
 	$champs = sql_fetsel($select, $table, $cle . '=' . $id_objet);
 
 	if ($champs) {
@@ -230,6 +233,7 @@ function a2ta_associations_collectionjson_traiter_parametres($parametres) {
  */
 function a2ta_associations_recuperer_contenu_collection($contexte, $count = false) {
 	$select = array();
+	$from = array();
 	$where = array();
 	$having = array();
 	$groupby = array();
@@ -241,8 +245,8 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 	$table = $contexte['table'];
 
 	$limit = $contexte['offset'].','.$contexte['pagination'];
-	$from = $table.' AS L1';
-	$orderby[] = 'L1.nom';
+	$from[] = $table.' AS l1';
+	$orderby[] = 'l1.nom';
 
 	$id_association = $contexte['parametres']['id_association'];
 	$id_mot = $contexte['parametres']['id_mot'];
@@ -257,43 +261,117 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 			$lignes = sql_countsel($from);
 
 		} else {
+			$from[] = 'INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
+			$from = implode(' ', $from);
+			$where[] = 'l1.statut='.sql_quote('publie');
 			$lignes = sql_allfetsel($select, $from, '', '', $orderby, $limit, '');
 
 		}
 	} else {
 
 		if ($id_association) {
-			$where[] = 'L1.statut='.sql_quote('publie');
-			$where[] = sql_in('L1.id_association', $id_association);
+			// Ne prendre en compte que les identifiants numériques.
+			$_ids = array();
+			foreach ($id_association as $id) {
+				if (preg_match(',^[1-9][0-9]*$,', $id)) {
+					$_ids[] = $id;
+				} else {
+					$_ids[] = 0;
+				}
+			}
+
+			$from[] = 'INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
+			$from = implode(' ', $from);
+			$where[] = 'l1.statut='.sql_quote('publie');
+			$where[] = sql_in('l1.id_association', $_ids);
 		}
 
 		if ($ville) {
-			$from .= ' INNER JOIN spip_adresses_liens AS L2 ON (L2.objet="association" AND L2.id_objet=L1.id_association)';
-			$from  .= ' INNER JOIN spip_adresses AS L3 ON (L3.id_adresse=L2.id_adresse)';
-			$where[] = 'L3.ville=' .sql_quote($ville[0]);
-			$where[] = 'L1.statut='.sql_quote('publie');
+			$search = $ville[0];
+			$from[] = 'INNER JOIN spip_adresses_liens AS l2 ON (l2.objet="association" AND l2.id_objet=l1.id_association)';
+			$from[] = 'INNER JOIN spip_adresses AS l3 ON (l3.id_adresse=l2.id_adresse)';
+			$from[] = 'INNER JOIN spip_gis_liens AS l4 ON (l4.id_objet = l1.id_association AND l4.objet = "association")';
+			$from = implode(' ', $from);
+			$where[] = 'l3.ville LIKE '.sql_quote("%${search}%");
+			$where[] = 'l1.statut='.sql_quote('publie');
 		}
 
 		if ($id_mot) {
-			$nb = count($id_mot);
+			// Ne prendre en compte que les identifiants numériques.
+			$_ids = array();
+			foreach ($id_mot as $id) {
+				if (preg_match(',^[1-9][0-9]*$,', $id)) {
+					$_ids[] = $id;
+				} else {
+					$_ids[] = 0;
+				}
+			}
 
-			$from .= ' INNER JOIN spip_mots_liens AS L4 ON (L4.objet="association" AND L4.id_objet=L1.id_association)';
-			$where[] = 'L1.statut='.sql_quote('publie');
-			$where[] = sql_in('L4.id_mot ', $id_mot);
+			$where_assos = a2ta_associations_prepare_mots($_ids);
 
-			$groupby[] = 'L1.id_association';
-			$having[] = 'COUNT(DISTINCT L4.id_mot)='.$nb;
+			if ($where_assos) {
+				$from[] = 'INNER JOIN spip_gis_liens AS l4 ON (l4.id_objet = l1.id_association AND l4.objet = "association")';
+				$from = implode(' ', $from);
+				$where[] = 'l1.statut='.sql_quote('publie');
+				$where[] = $where_assos;
+
+			} else {
+				$from = implode(' ', $from);
+				$where[] = 'l1.id_association=0';
+			}
 		}
-
 		if ($count) {
-			$lignes = sql_countsel($from, $where, $groupby, $having);
+			$lignes = sql_countsel($from, $where);
 
 		} else {
-			$lignes = sql_allfetsel($select, $from, $where, $groupby, $orderby, $limit, $having);
+			$lignes = sql_allfetsel($select, $from, $where, '', $orderby, $limit, '');
 
 		}
-
 	}
 
 	return $lignes;
+}
+
+/**
+ * Requête de sélection des associations selon une série de mots-clés.
+ * Il s'agit d'extraire les associations qui possède un mot-clé ET un autre.
+ *
+ * Code repris du plugin critere_mots.
+ *
+ * @param  array $mots  Les mots-clés de la requête
+ * @param  string $table Uniquement la table associations.
+ * @return array|string
+ */
+function a2ta_associations_prepare_mots($mots, $table = 'associations') {
+	$_table = table_objet($table);
+	$objet_delatable = objet_type($_table);
+	$_id_table = id_table_objet($table);
+	$where = array();
+
+	foreach ($mots as $mot) {
+		$id_mot = $mot;
+		$where[] = 'id_mot='.sql_quote($id_mot).' and objet='.sql_quote($objet_delatable);
+	}
+
+	$having = ' HAVING SUM(1) >= '.ceil(1 * count($where));
+
+	$in = array();
+
+	$s = sql_query("SELECT id_objet as i FROM spip_mots_liens WHERE "
+		. join(' OR ', $where)
+		. ' GROUP BY id_objet,objet'
+		. $having);
+
+	while ($t = sql_fetch($s)) {
+		$in[] = $t['i'];
+	}
+
+	if ($in) {
+		$wh = sql_in("l1.$_id_table", $in); // Attention, on utilise ici l1, en réf à la table association dans la requête principale.
+
+	} else {
+		$wh = '0';
+	}
+
+	return $wh;
 }
