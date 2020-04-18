@@ -304,8 +304,6 @@ function a2ta_associations_recuperer_contenu_collection($contexte) {
 				}
 			}
 			$where .= ' and l1.statut='.sql_quote('publie');
-
-			//$cpt_ville = sql_countsel($from, $where);
 			$requetes[] = sql_select($select, $from, $where, '', $orderby, $limit, '');
 		}
 
@@ -332,8 +330,8 @@ function a2ta_associations_recuperer_contenu_collection($contexte) {
 				$where = array('l1.id_association=0');
 			}
 
-			// $cpt_mot = sql_countsel($from, $where);
 			$requetes[] = sql_select($select, $from, $where, '', '', $limit, '');
+			// $requetes[] = sql_allfetsel($select, $from, $where, '', '', $limit, '');
 		}
 
 		$in = array();
@@ -345,6 +343,7 @@ function a2ta_associations_recuperer_contenu_collection($contexte) {
 			}
 			if ($in) {
 				$wh[] = sql_in("id_association", $in);
+				$in = array();
 			}
 		}
 	}
