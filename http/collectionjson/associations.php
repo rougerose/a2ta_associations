@@ -43,11 +43,11 @@ function http_collectionjson_associations_get_collection($requete, $reponse) {
 
 	// récupérer le contenu
 	$lignes = a2ta_associations_recuperer_contenu_collection($contexte);
+	$nb_objets = array_pop($lignes);
+	$lignes = $lignes[0];
 
 	if ($lignes) {
 		$objets = array();
-		// compter le nombre total d'objets sans les contraintes de pagination
-		$nb_objets = a2ta_associations_recuperer_contenu_collection($contexte, true);
 		$pagination = $contexte['pagination'];
 		$offset = $contexte['offset'];
 
@@ -227,16 +227,13 @@ function a2ta_associations_collectionjson_traiter_parametres($parametres) {
  * 	- parametres : id_association, id_mots, ville
  * 	- offset
  * 	- pagination
- *
- * @param  boolean $count
- * 	le nombre total de résultats de la requete
+
  * @return array|integer
  * 	Un tableau contenant tous les résultats de la requete
  * 	ou le nombre total des résultats.
  */
-function a2ta_associations_recuperer_contenu_collection($contexte, $count = false) {
+function a2ta_associations_recuperer_contenu_collection($contexte) {
 	$select = array();
-	$from = array();
 	$where = array();
 	$having = array();
 	$groupby = array();
@@ -255,22 +252,22 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 	$id_mot = $contexte['parametres']['id_mot'];
 	$ville = $contexte['parametres']['ville'];
 
-	$lignes = array();
-	$select = array($cle, 'nom', 'url_site', 'url_site_supp');
+	$cpt = 0;
+	$requetes = array();
+	$resultats = array();
+
 
 	if (is_null($id_association) and is_null($id_mot) and is_null($ville)) {
+		$select = array($cle, 'nom');
+		$from = $table.' AS l1';
+		$from .= ' INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
+		$where = array('l1.statut='.sql_quote('publie'));
 
-		if ($count) {
-			$lignes = sql_countsel($from);
+		$cpt = sql_countsel($from);
+		$resultats = sql_allfetsel($select, $from, '', '', $orderby, $limit, '');
 
-		} else {
-			$from[] = 'INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
-			$from = implode(' ', $from);
-			$where[] = 'l1.statut='.sql_quote('publie');
-			$lignes = sql_allfetsel($select, $from, '', '', $orderby, $limit, '');
-
-		}
 	} else {
+		$select = array($cle);
 
 		if ($id_association) {
 			// Ne prendre en compte que les identifiants numériques.
@@ -282,21 +279,34 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 					$_ids[] = 0;
 				}
 			}
+			$from = $table.' AS l1';
+			$from .= ' INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
 
-			$from[] = 'INNER JOIN spip_gis_liens AS l2 ON (l2.id_objet = l1.id_association AND l2.objet = "association")';
-			$from = implode(' ', $from);
-			$where[] = 'l1.statut='.sql_quote('publie');
+			$where = array('l1.statut='.sql_quote('publie'));
 			$where[] = sql_in('l1.id_association', $_ids);
+
+			$requetes[] = sql_select($select, $from, $where, '', $orderby, $limit, '');
 		}
 
 		if ($ville) {
-			$search = $ville[0];
-			$from[] = 'INNER JOIN spip_adresses_liens AS l2 ON (l2.objet="association" AND l2.id_objet=l1.id_association)';
-			$from[] = 'INNER JOIN spip_adresses AS l3 ON (l3.id_adresse=l2.id_adresse)';
-			$from[] = 'INNER JOIN spip_gis_liens AS l4 ON (l4.id_objet = l1.id_association AND l4.objet = "association")';
-			$from = implode(' ', $from);
-			$where[] = 'l3.ville LIKE '.sql_quote("%${search}%");
-			$where[] = 'l1.statut='.sql_quote('publie');
+			$where = '';
+			$from = $table.' AS l1';
+			$from .= ' INNER JOIN spip_adresses_liens AS l2 ON (l2.objet="association" AND l2.id_objet=l1.id_association)';
+			$from .= ' INNER JOIN spip_adresses AS l3 ON (l3.id_adresse=l2.id_adresse)';
+			$from .= ' INNER JOIN spip_gis_liens AS l4 ON (l4.id_objet = l1.id_association AND l4.objet = "association")';
+
+			if (is_array($ville) and count($ville) >= 1) {
+				foreach ($ville as $k => $commune) {
+					if ($k > 0) {
+						$where .= ' OR ';
+					}
+					$where .= 'l3.ville LIKE '.sql_quote("%$commune%");
+				}
+			}
+			$where .= ' and l1.statut='.sql_quote('publie');
+
+			//$cpt_ville = sql_countsel($from, $where);
+			$requetes[] = sql_select($select, $from, $where, '', $orderby, $limit, '');
 		}
 
 		if ($id_mot) {
@@ -311,28 +321,42 @@ function a2ta_associations_recuperer_contenu_collection($contexte, $count = fals
 			}
 
 			$where_assos = a2ta_associations_prepare_mots($_ids);
+			$from = $table.' AS l1';
 
 			if ($where_assos) {
-				$from[] = 'INNER JOIN spip_gis_liens AS l4 ON (l4.id_objet = l1.id_association AND l4.objet = "association")';
-				$from = implode(' ', $from);
-				$where[] = 'l1.statut='.sql_quote('publie');
+				$from .= ' INNER JOIN spip_gis_liens AS l4 ON (l4.id_objet = l1.id_association AND l4.objet = "association")';
+				$where = array('l1.statut='.sql_quote('publie'));
 				$where[] = $where_assos;
 
 			} else {
-				$from = implode(' ', $from);
-				$where[] = 'l1.id_association=0';
+				$where = array('l1.id_association=0');
 			}
+
+			// $cpt_mot = sql_countsel($from, $where);
+			$requetes[] = sql_select($select, $from, $where, '', '', $limit, '');
 		}
-		if ($count) {
-			$lignes = sql_countsel($from, $where);
 
-		} else {
-			$lignes = sql_allfetsel($select, $from, $where, '', $orderby, $limit, '');
+		$in = array();
+		$wh = array();
 
+		foreach ($requetes as $requete) {
+			while ($id = sql_fetch($requete)) {
+				$in[] = $id['id_association'];
+			}
+			if ($in) {
+				$wh[] = sql_in("id_association", $in);
+			}
 		}
 	}
 
-	return $lignes;
+	if ($wh) {
+		$select = array($cle, 'nom');
+		$from = $table;
+		$cpt = sql_countsel($from, $wh);
+		$resultats = sql_allfetsel($select, $from, $wh);
+	}
+
+	return $lignes = array($resultats, $cpt);
 }
 
 /**
