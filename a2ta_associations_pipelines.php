@@ -49,3 +49,22 @@ function a2ta_associations_formulaire_saisies($flux) {
 
   return $flux;
 }
+
+/**
+ * Réduire la liste des réseaux sociaux à (facebook, twitter, instagram)
+ * qui seront les seuls pris en compte dans les exports json des associations.
+ *
+ * Utilise le pipeline du plugin rezosocios
+ *
+ * @param  array $flux
+ * @return array
+ */
+function a2ta_associations_rezosocios_liste($flux) {
+	$rezos = array(
+		'facebook' => $flux['facebook'],
+		'twitter' => $flux['twitter'],
+		'instagram' => $flux['instagram']
+	);
+	$flux = $rezos;
+	return $flux;
+}
