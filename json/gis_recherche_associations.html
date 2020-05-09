@@ -1,10 +1,17 @@
-<BOUCLE_art(ASSOCIATIONS){gis}{id_association IN #ENV{id_association}}{0, #ENV{limit}}{","}>
+<BOUCLE_asso(ASSOCIATIONS){gis}{id_association IN #ENV{id_association}}{0, #ENV{limit}}{","}>
 {"type": "Feature",
 ["geometry": (#GEOMETRY|appliquer_filtre{wkt_to_json}|sinon{{"type": "Point", "coordinates": \[#LON, #LAT\]}}),]
 "id":"#ID_GIS",
 "properties": {
-  "title":[(#URL_ASSOCIATION|lien_ou_expose{[(#TITRE_GIS*|sinon{#TITRE*}|extraire_multi|supprimer_numero)]}|json_encode)],
-  "description":[(#DESCRIPTIF_GIS|sinon{#DESCRIPTIF}|json_encode)][
+  "title":[(#NOM*|json_encode)],
+  "description":[(#DESCRIPTIF|textebrut|json_encode)],
+  "website1":[(#URL_SITE|json_encode)],
+  "website2":[(#URL_SITE_SUPP|json_encode)][,
+  (#INCLURE{fond=json/inc_association_rezos, id_association})][,
+  (#INCLURE{fond=json/inc_association_rezos, id_association})][,
+  (#INCLURE{fond=json/inc_association_adresse, id_association})][,
+  (#INCLURE{fond=json/inc_association_activites, id_association})][,
   (#LOGO_GIS|gis_icon_properties)][,
   "styles": (#GEOMETRY_STYLES|appliquer_filtre{geometry_styles_to_json})]
-}}</BOUCLE_art>
+}}</BOUCLE_asso>
+#FILTRE{trim}
