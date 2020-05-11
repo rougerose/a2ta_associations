@@ -5,6 +5,7 @@
 "properties": {
   "title":[(#NOM*|json_encode)],
   "description":[(#DESCRIPTIF|textebrut|json_encode)],
+	"fraapmember":[(#MEMBRE_FRAAP|json_encode)],
   "website1":[(#URL_SITE|json_encode)],
   "website2":[(#URL_SITE_SUPP|json_encode)][,
   (#INCLURE{fond=json/inc_association_rezos, id_association})][,
