@@ -66,7 +66,7 @@ function a2ta_associations_declarer_tables_objets_sql($tables) {
 		'date' => 'date',
 		'champs_editables'  => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp', 'log_import'),
 		'champs_versionnes' => array('nom', 'membre_fraap', 'date_creation', 'url_site', 'url_site_supp', 'log_import'),
-		'rechercher_champs' => array(),
+		'rechercher_champs' => array('nom' => 5),
 		'tables_jointures'  => array(),
 		'statut_textes_instituer' => array(
 			'prepa'    => 'texte_statut_en_cours_redaction',
