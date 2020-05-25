@@ -6,7 +6,7 @@
   compatibilite="[3.2.7;3.2.*]"
   logo=""
   documentation=""
-  schema="1.0.11"
+  schema="1.0.12"
 >
   <!--
     Paquet généré le 2020-03-06 15:03:17
@@ -23,7 +23,9 @@
   <necessite nom="verifier" compatibilite="[1.0.6;]" />
   <necessite nom="gis" compatibilite="[4.47.18;]" />
   <necessite nom="rezosocios" compatibilite="[0.6.2;]" />
-	<necessite nom="collectionjson" compatibilite="[1.5.1;]" />
+  <necessite nom="collectionjson" compatibilite="[1.5.1;]" />
+  <necessite nom="cextras" compatibilite="[3.12.7;[" />
+  <necessite nom="geographie" compatibilite="[2.1.0;[" />
 
   <pipeline nom="autoriser" inclure="a2ta_associations_autorisations.php" />
   <pipeline nom="declarer_tables_objets_sql" inclure="base/a2ta_associations.php" />

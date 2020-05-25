@@ -18,3 +18,4 @@ if (!defined('_COORDONNEES_TYPE_DEFAUT')) {
 // error_reporting(E_ALL^E_NOTICE);
 // ini_set ("display_errors", "On");
 // define('SPIP_ERREUR_REPORT',E_ALL);
+// define('_LOG_FILTRE_GRAVITE',8);
